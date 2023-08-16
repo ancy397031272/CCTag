@@ -17,15 +17,15 @@ include(GNUInstallDirs)
 option(CCTAG_SERIALIZE "Store all the output" OFF)
 option(CCTAG_VISUAL_DEBUG "Enable visual debug" OFF)
 option(CCTAG_NO_COUT "Disable output stream" ON)
-option(CCTAG_WITH_CUDA "Compile the library with CUDA support" ON)
-option(CCTAG_BUILD_APPS "Build the sample applications" ON)
+option(CCTAG_WITH_CUDA "Compile the library with CUDA support" OFF)
+option(CCTAG_BUILD_APPS "Build the sample applications" OFF)
 option(CCTAG_CUDA_CC_CURRENT_ONLY "Set to on to build only for the current machine's CC" OFF)
 option(CCTAG_NVCC_WARNINGS "Switch on several additional warnings for CUDA nvcc." OFF)
 option(CCTAG_EIGEN_MEMORY_ALIGNMENT "Enable Eigen alignment" OFF)
 
 option(CCTAG_USE_POSITION_INDEPENDENT_CODE "Generate position independent code." ON)
 option(CCTAG_ENABLE_SIMD_AVX2 "Enable AVX2 optimizations" OFF)
-option(CCTAG_BUILD_TESTS "Build the unity tests" ON)
+option(CCTAG_BUILD_TESTS "Build the unity tests" OFF)
 option(CCTAG_BUILD_DOC "Build documentation" OFF)
 option(CCTAG_NO_THRUST_COPY_IF "Do not use thrust::copy_if() on GPU. There may be a bug on CUDA 7 with GTX 980, 980Ti and 1080" OFF)
 option(BUILD_SHARED_LIBS "Build shared libraries" ON)
@@ -61,7 +61,7 @@ if(MSVC AND CMAKE_GENERATOR MATCHES "Ninja")
     set(CCTAG_MVSC_LINKER "/MT")
   endif()
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-      set(CCTAG_MVSC_LINKER "${CCTAG_MVSC_LINKER}d")
+    set(CCTAG_MVSC_LINKER "${CCTAG_MVSC_LINKER}d")
   endif()
   list(APPEND CUDA_NVCC_FLAGS   -Xcompiler ${CCTAG_MVSC_LINKER})
 endif()
@@ -105,12 +105,16 @@ if(APPLE)
   SET(CMAKE_SKIP_BUILD_RPATH  FALSE) # don't skip the full RPATH for the build tree
   # SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE) # when building, don't use the install RPATH already
   SET(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE) # when building, use the install RPATH already
-                                           # probably not needed
+  # probably not needed
   # SET(CMAKE_INSTALL_RPATH "") # the RPATH to be used when installing
   SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE) # LC_RPATH for CUDA and OpenCV etc written into executable
 endif(APPLE)
 
 # FIND BOOST
+set(BOOST_ROOT "D:/WorkSpace/Sources/3rdParty/Boost" CACHE FILEPATH "Boost root path")
+set(Boost_LIBRARY_DIRS ${BOOST_ROOT}/lib)
+#set(Boost_USE_STATIC_LIBS OFF)
+
 set(BOOST_REQUIRED_COMPONENTS "atomic;chrono;date_time;filesystem;program_options;serialization;system;thread;timer;math_c99")
 if(WIN32)
   set(BOOST_REQUIRED_COMPONENTS "${BOOST_REQUIRED_COMPONENTS};stacktrace_windbg")
@@ -247,16 +251,16 @@ message(STATUS "Found TBB: version ${TBB_VERSION}")
 add_subdirectory(src)
 
 if(CCTAG_BUILD_DOC)
- add_subdirectory(doc)
+  add_subdirectory(doc)
 endif()
 
 ########### Add uninstall target ###############
 configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY)
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake"
+        IMMEDIATE @ONLY)
 add_custom_target(cctag_uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
+        "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
 
 
 ######################################
